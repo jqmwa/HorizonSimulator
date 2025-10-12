@@ -89,8 +89,15 @@ pip install -r requirements.txt
 
 3. **Set up API keys**
 ```bash
-export OPENAI_API_KEY="your-openai-key"
-export DEEPSEEK_API_KEY="your-deepseek-key"
+export OPENAI_API_KEY="your-openai-key-here"
+export DEEPSEEK_API_KEY="your-deepseek-key-here"
+```
+
+Or create a `.env` file (recommended):
+```bash
+# .env file
+OPENAI_API_KEY=your-openai-key-here
+DEEPSEEK_API_KEY=your-deepseek-key-here
 ```
 
 4. **Start the backend server**
