@@ -1,0 +1,29 @@
+{
+  "name": "swarms-ai-visualization",
+  "version": "1.0.0",
+  "description": "Three.js visualization of AI Agents communicating in a swarm network",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "threejs",
+    "ai",
+    "visualization",
+    "agents",
+    "swarm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "three": "^0.158.0"
+  }
+}
+

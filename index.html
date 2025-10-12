@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swarms - AI Agent Visualization</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inika:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=21">
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://esm.sh/three@0.158.0",
+        "three/addons/": "https://esm.sh/three@0.158.0/examples/jsm/"
+      }
+    }
+    </script>
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="swarms-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="menu-breadcrumb">
+                <div class="menu-hamburger">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </div>
+                <span class="breadcrumb-text">HORIZON / Swarm Activation</span>
+            </div>
+            
+            <div class="proposals-counter">
+                <div class="counter-label">Proposals Created</div>
+                <div class="counter-value">000</div>
+            </div>
+            
+            <div class="angels-connected">
+                <div class="counter-label">Angels Inventory</div>
+                <div class="counter-value">007</div>
+            </div>
+            
+            <div class="horizon-status">
+                <div class="status-label">Daemon Status</div>
+                <div class="status-indicator">
+                    <div class="status-dot online"></div>
+                    <span>Online</span>
+                </div>
+            </div>
+            
+            <div class="token-counter">
+                <div class="counter-label">USED TOKENS</div>
+                <div class="counter-value">234/34.000</div>
+            </div>
+        </nav>
+
+        <!-- Main Content Grid -->
+        <div class="main-container-grid">
+            <!-- Left Side Panel -->
+            <div class="left-side">
+                <!-- Request Input Block -->
+                <div class="left-block-one">
+                    <div class="request-header">> ACTIVATE HORIZON PIOGRAM</div>
+                    <textarea 
+                        class="request-input" 
+                        placeholder="CONVERSATION LOG - Agent responses will appear here..."
+                        readonly
+                    ></textarea>
+                </div>
+                
+                <!-- Username Block -->
+                <div class="username-block">
+                    <div class="username-header">
+                        <div class="username-text">> Username: <input type="text" id="usernameInput" class="username-input" value="Traveler"></div>
+                    </div>
+                    
+                    <!-- Message Input Container -->
+                    <div class="message-input-container">
+                        <input type="text" id="messageInput" class="message-input" placeholder="Type your message to the agents...">
+                        <button id="sendMessage" class="send-btn">SEND</button>
+                    </div>
+                </div>
+                
+                <!-- Control Buttons Block -->
+                <div class="controls-block">
+                    <div class="button-row">
+                        <button class="control-btn personas-btn">PERSONAS</button>
+                        <button class="control-btn simulation-btn">SIMULATION RULES</button>
+                    </div>
+                    <button class="control-btn upload-knowledge-btn">HORIZON FEEDER</button>
+                    <input type="file" id="knowledgeFileInput" accept=".txt,.md,.pdf" style="display: none;">
+                </div>
+            </div>
+
+            <!-- TV Screen (Three.js Canvas) -->
+            <div class="tv-screen">
+                <canvas id="threeCanvas"></canvas>
+                
+                <!-- Control Buttons Overlay -->
+                <div class="screen-controls">
+                    <button class="screen-btn stimulate-btn">STIMULATE</button>
+                    <button class="screen-btn freeze-btn">FREEZE</button>
+                    <button class="screen-btn third-btn">TOGGLE CHAT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-bar">
+                <div class="footer-menu">
+                    <div class="menu-hamburger small">
+                        <div class="hamburger-line"></div>
+                        <div class="hamburger-line"></div>
+                        <div class="hamburger-line"></div>
+                    </div>
+                    <span class="footer-text">PARSING INPUT VECTORS... OK</span>
+                </div>
+                <div class="swarm-status">
+                    <span>Swarm Active.</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Personas Modal -->
+    <div id="personasModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>CONFIGURE AGENT PERSONAS</h2>
+                <button class="close-modal" data-modal="personasModal">&times;</button>
+            </div>
+            <div class="quickset-presets">
+                <span class="preset-label">QUICKSET:</span>
+                <button class="preset-btn" data-preset="default">DEFAULT</button>
+                <button class="preset-btn" data-preset="philosophers">PHILOSOPHERS</button>
+                <button class="preset-btn" data-preset="scientists">SCIENTISTS</button>
+                <button class="preset-btn" data-preset="innovators">INNOVATORS</button>
+                <button class="preset-btn" data-preset="debaters">DEBATERS</button>
+            </div>
+            <div class="modal-body">
+                <div id="personasList" class="personas-list">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn apply-btn" id="applyPersonas">APPLY CHANGES</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulation Rules Modal -->
+    <div id="simulationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>SIMULATION RULES</h2>
+                <button class="close-modal" data-modal="simulationModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="rule-section">
+                    <label class="rule-label">CONVERSATION MODE</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="convMode" value="turn-by-turn" checked>
+                            <span>Turn-by-Turn</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="convMode" value="aggressive">
+                            <span>Aggressive</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="convMode" value="fireside">
+                            <span>Fireside</span>
+                        </label>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn apply-btn" id="applySimulation">APPLY RULES</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script type="module" src="main.js?v=36"></script>
+</body>
+</html>
+
