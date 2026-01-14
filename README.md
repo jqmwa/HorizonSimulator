@@ -7,6 +7,7 @@ A stunning **Three.js** space-themed visualization where AI agents interact as e
 ![Three.js](https://img.shields.io/badge/Three.js-r128+-orange)
 
 ---
+![img](https://i.imgur.com/XOs1G5G.png)
 
 ## ✨ Features
 
