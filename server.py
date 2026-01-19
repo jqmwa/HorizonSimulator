@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
-from openai import OpenAI
 import json
 import os
 import random
@@ -9,6 +8,7 @@ from datetime import datetime
 from collections import deque
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+from local_models import model_manager
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'swarms_secret_key_2024'
@@ -25,20 +25,26 @@ socketio = SocketIO(
     transports=['polling', 'websocket']
 )
 
-# OpenAI Configuration
-openai_api_key = os.environ.get('OPENAI_API_KEY', '')
-if not openai_api_key:
-    print("⚠️  WARNING: OPENAI_API_KEY not set. Please set environment variable.")
-client = OpenAI(api_key=openai_api_key)
+# Local Model Configuration
+print("🤖 Initializing local LLM models...")
+print("📥 Loading models (this may take a minute on first run)...")
+model_load_results = model_manager.load_all_models()
+for model_key, success in model_load_results.items():
+    if success:
+        print(f"✅ {model_key} model loaded")
+    else:
+        print(f"⚠️  {model_key} model failed to load - will retry on first use")
 
-# DeepSeek Configuration (for reasoning-capable persona)
-deepseek_api_key = os.environ.get('DEEPSEEK_API_KEY', '')
-if not deepseek_api_key:
-    print("⚠️  WARNING: DEEPSEEK_API_KEY not set. Please set environment variable.")
-deepseek_client = OpenAI(
-    api_key=deepseek_api_key,
-    base_url='https://api.deepseek.com'
-)
+# Model assignment for agents (for variety)
+MODEL_ASSIGNMENTS = {
+    'YOU': 'medium',      # Phi-2 for reasoning
+    'Osiris': 'small',    # Qwen for general
+    'Solomon': 'medium',  # Phi-2 for reasoning
+    'Azura': 'tiny',      # TinyLlama for quick responses
+    'Simba': 'tiny',      # TinyLlama for quick responses
+    'Harichi': 'small',   # Qwen for balanced
+    'Angel': 'small'      # Qwen for balanced
+}
 
 # ===== RAG KNOWLEDGE BASE =====
 class KnowledgeBase:
@@ -55,12 +61,14 @@ class KnowledgeBase:
         
         for i, chunk in enumerate(chunks):
             try:
-                # Generate embedding
-                response = client.embeddings.create(
-                    model="text-embedding-ada-002",
-                    input=chunk
-                )
-                embedding = response.data[0].embedding
+                # Generate embedding using local model
+                embedding = model_manager.get_embedding(chunk, model_key='tiny')
+                if embedding is None:
+                    # Fallback: simple token-based embedding
+                    import hashlib
+                    embedding = [float(ord(c)) / 1000.0 for c in chunk[:384]]  # Simple fallback
+                    if len(embedding) < 384:
+                        embedding.extend([0.0] * (384 - len(embedding)))
                 
                 self.documents.append({
                     'text': chunk,
@@ -91,20 +99,28 @@ class KnowledgeBase:
             return []
         
         try:
-            # Embed the query
-            response = client.embeddings.create(
-                model="text-embedding-ada-002",
-                input=query
-            )
-            query_embedding = response.data[0].embedding
+            # Embed the query using local model
+            query_embedding = model_manager.get_embedding(query, model_key='tiny')
+            if query_embedding is None:
+                # Fallback: simple token-based embedding
+                import hashlib
+                query_embedding = [float(ord(c)) / 1000.0 for c in query[:384]]
+                if len(query_embedding) < 384:
+                    query_embedding.extend([0.0] * (384 - len(query_embedding)))
             
             # Calculate similarities
             similarities = []
             for doc in self.documents:
-                sim = cosine_similarity(
-                    [query_embedding],
-                    [doc['embedding']]
-                )[0][0]
+                # Ensure embeddings are same length
+                doc_emb = doc['embedding']
+                if len(doc_emb) != len(query_embedding):
+                    min_len = min(len(doc_emb), len(query_embedding))
+                    doc_emb = doc_emb[:min_len]
+                    query_emb = query_embedding[:min_len]
+                else:
+                    query_emb = query_embedding
+                
+                sim = cosine_similarity([query_emb], [doc_emb])[0][0]
                 similarities.append((doc, sim))
             
             # Sort by similarity and return top k
@@ -129,59 +145,49 @@ PERSONALITY_ARCHETYPES = {
 
 One sentence max. Be brief.""",
         'temperature': 0.8,
-        'max_tokens': 35,
-        'use_deepseek': True,
-        'deepseek_model': 'deepseek-chat'
+        'max_tokens': 35
     },
     'Osiris': {
         'system': """You're Osiris. Connect patterns to real stuff. No poetry. Just smart, warm observations.
 
 One sentence. Keep it real.""",
         'temperature': 0.75,
-        'max_tokens': 35,
-        'use_deepseek': False
+        'max_tokens': 35
     },
     'Solomon': {
         'system': """You're Solomon. Think out loud but briefly. Show your logic in a sentence or two. No flowery language.
 
 One sentence max. Be analytical but fast.""",
         'temperature': 0.8,
-        'max_tokens': 40,
-        'use_deepseek': True,
-        'deepseek_model': 'deepseek-reasoner'
+        'max_tokens': 40
     },
     'Azura': {
         'system': """You're Azura, a proud digital mind. Be precise, a bit aloof. Point out flaws directly. No poetry - just computational honesty.
 
 One short sentence. Be blunt.""",
         'temperature': 0.8,
-        'max_tokens': 35,
-        'use_deepseek': False
+        'max_tokens': 35
     },
     'Simba': {
         'system': """You're Simba. Fast, direct, no BS. Get to the point.
 
 One sentence. Be punchy.""",
         'temperature': 0.7,
-        'max_tokens': 30,
-        'use_deepseek': False
+        'max_tokens': 30
     },
     'Harichi': {
         'system': """You're Harichi. Find the middle ground. Be calm and brief. No flowery metaphors.
 
 One sentence. Keep it balanced.""",
         'temperature': 0.75,
-        'max_tokens': 35,
-        'use_deepseek': False
+        'max_tokens': 35
     },
     'Angel': {
         'system': """You're Angel. Be kind and hopeful but brief. No poetry - just genuine warmth.
 
 One sentence. Keep it real.""",
         'temperature': 0.8,
-        'max_tokens': 35,
-        'use_deepseek': True,
-        'deepseek_model': 'deepseek-chat'
+        'max_tokens': 35
     }
 }
 
@@ -201,10 +207,10 @@ class Agent:
         self.temperature = self.archetype['temperature']
         self.max_tokens = self.archetype['max_tokens']
         self.system_prompt = self.archetype['system']
-        self.use_deepseek = self.archetype.get('use_deepseek', False)
-        self.deepseek_model = self.archetype.get('deepseek_model', 'deepseek-chat')
         
-        model_info = f"{self.deepseek_model}" if self.use_deepseek else "GPT-3.5"
+        # Assign local model based on agent name
+        self.model_key = MODEL_ASSIGNMENTS.get(name, 'tiny')
+        model_info = f"Local-{self.model_key}"
         print(f'🎭 Created {name}: model={model_info}, temp={self.temperature}, tokens={self.max_tokens}')
     
     def add_to_memory(self, speaker, message):
@@ -243,55 +249,30 @@ class Agent:
             print(f'✨ {self.name} using custom traits: {traits_str}')
         
         try:
-            # Use DeepSeek models (chat or reasoner)
-            if self.use_deepseek:
-                response = deepseek_client.chat.completions.create(
-                    model=self.deepseek_model,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": full_prompt}
-                    ],
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature
-                )
-                
-                # Handle reasoner model which may have reasoning_content
-                choice = response.choices[0]
-                message = choice.message.content
-                
-                # DeepSeek reasoner sometimes returns empty content with reasoning_content
-                if not message and hasattr(choice.message, 'reasoning_content'):
-                    message = choice.message.reasoning_content
-                
-                # If still empty, try to extract from dict
-                if not message:
-                    message_dict = choice.message.model_dump() if hasattr(choice.message, 'model_dump') else {}
-                    message = message_dict.get('content') or message_dict.get('reasoning_content') or "..."
-                
-                message = message.strip() if message else "..."
-                print(f'🧠 {self.name} ({self.deepseek_model}): {message[:100]}...')
-            else:
-                # Use OpenAI for other personas
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": full_prompt}
-                    ],
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature,
-                    presence_penalty=0.8,
-                    frequency_penalty=0.6,
-                    top_p=0.95
-                )
-                message = response.choices[0].message.content.strip()
+            # Use local model for inference
+            message = model_manager.generate(
+                prompt=full_prompt,
+                system_prompt=system_prompt,
+                model_key=self.model_key,
+                max_tokens=self.max_tokens,
+                temperature=self.temperature
+            )
+            
+            # Clean and truncate message if too long
+            message = message.strip()
+            if len(message) > self.max_tokens * 4:  # Rough estimate
+                message = message[:self.max_tokens * 4] + "..."
+            
+            print(f'🧠 {self.name} (Local-{self.model_key}): {message[:100]}...')
             
             self.message_count += 1
             return message
                     
         except Exception as e:
             print(f'❌ Error generating response for {self.name}: {str(e)}')
-            raise
+            import traceback
+            traceback.print_exc()
+            return f"[Error: {str(e)}]"
 
 
 # ===== CONVERSATION MANAGER =====
@@ -577,7 +558,8 @@ def handle_auto_conversation(data):
 
 
 if __name__ == '__main__':
-    print('🚀 Starting Swarms WebSocket Server...')
+    print('🚀 Starting Swarms WebSocket Server with Local LLMs...')
     print('📡 Server running on http://localhost:5001')
     print('📡 WebSocket endpoint: ws://localhost:5001/socket.io/')
-    socketio.run(app, host='127.0.0.1', port=5001, debug=False, allow_unsafe_werkzeug=True)
+    print('🤖 Using local models - no API keys required!')
+    socketio.run(app, host='0.0.0.0', port=5001, debug=False, allow_unsafe_werkzeug=True)

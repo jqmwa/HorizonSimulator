@@ -4,30 +4,118 @@
     box-sizing: border-box;
 }
 
+/* Dark Mode (Default) */
 :root {
-    --bg-black: #000000;
-    --text-white: #FFFFFF;
-    --text-gray: rgba(236, 236, 236, 0.56);
-    --border-gray: #9E9E9E;
-    --online-green: #1CFFAC;
+    --bg-primary: #1C1E26;
+    --bg-secondary: #000000;
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(236, 236, 236, 0.56);
+    --border-color: #9E9E9E;
+    --accent-primary: #16BD8B;
+    --accent-secondary: #44E990;
+    --highlight: #6178FF;
+    --special: #4D48E6;
+    --dark-accent: #164B3A;
+    
+    /* RuneScape Theme Variables */
+    --rs-bg-primary: #1e1e1e;
+    --rs-bg-primary-rgb: 12, 12, 12;
+    --rs-text-primary: #d7dbe1;
+    --rs-text-muted: #5c5c5c;
+    --rs-bg-opacity: 0.9;
+}
+
+/* Light Mode */
+[data-theme="light"] {
+    --bg-primary: #ECECFF;
+    --bg-secondary: #E1E1FE;
+    --text-primary: #1C1E26;
+    --text-secondary: #4D48E6;
+    --border-color: #6178FF;
+    --accent-primary: #16BD8B;
+    --accent-secondary: #44E990;
+    --highlight: #4D48E6;
+    --special: #6178FF;
+    --dark-accent: #164B3A;
+}
+
+/* Legacy variable support */
+:root, [data-theme="light"] {
+    --bg-black: var(--bg-secondary);
+    --text-white: var(--text-primary);
+    --text-gray: var(--text-secondary);
+    --border-gray: var(--border-color);
+    --online-green: var(--accent-primary);
 }
 
 body {
     font-family: 'Space Mono', monospace;
-    background: var(--bg-black);
+    background: var(--bg-primary) url('./assets/texture.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: var(--text-white);
     overflow: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    /* RuneScape Base Styling */
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    line-height: 1;
+    font-size: 62.5%;
+    text-align: left;
+    vertical-align: baseline;
 }
 
 .swarms-container {
     width: 1728px;
     height: 1023px;
     margin: 0 auto;
-    background: var(--bg-black);
+    background: var(--bg-primary);
     display: flex;
     flex-direction: column;
     gap: 16px;
     padding: 16px;
+    transition: background-color 0.3s ease;
+}
+
+/* ========== RUNESCAPE TABBED ELEMENT ========== */
+.rs-tabbed-element {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    line-height: 1;
+    font-size: 62.5%;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    color: var(--rs-text-primary);
+    border: 0;
+    outline: 0;
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: transparent url('https://www.runescape.com/img/rs3/tabbedelement.png') repeat-x 0 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.rs-tabbed-element::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent url('https://www.runescape.com/img/rs3/tabbedelement.png') repeat-x 0 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.rs-tabbed-element > * {
+    position: relative;
+    z-index: 1;
 }
 
 /* ========== NAVBAR ========== */
@@ -36,8 +124,8 @@ body {
     align-items: center;
     justify-content: space-between;
     height: 79px;
-    padding: 0 15px;
-    gap: 30px;
+    padding: 0 20px;
+    gap: 20px;
 }
 
 .menu-breadcrumb {
@@ -68,6 +156,11 @@ body {
 
 .menu-hamburger.small .hamburger-line {
     background: var(--text-gray);
+}
+
+.breadcrumb-text-wrapper {
+    display: flex;
+    align-items: center;
 }
 
 .breadcrumb-text {
@@ -117,11 +210,74 @@ body {
     box-shadow: 0 0 10px var(--online-green);
 }
 
+/* Theme Toggle Button */
+.theme-toggle {
+    width: 40px;
+    height: 40px;
+    background: var(--bg-black);
+    border: 2px solid var(--border-gray);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 20px;
+    color: var(--text-white);
+}
+
+.theme-toggle:hover {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    transform: rotate(180deg);
+}
+
 /* ========== MAIN CONTAINER GRID ========== */
 .main-container-grid {
     display: flex;
     gap: 0;
     height: 828px;
+}
+
+/* ========== STONEWORK BORDERS (RuneScape Style) ========== */
+.stonework-border {
+    position: relative;
+    background: transparent;
+    border: solid 1px #09202B;
+    box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.8);
+    /* Left and right borders using background-image */
+    background-image: 
+        url('https://www.runescape.com/img/rs3/6-box-left.jpg'),
+        url('https://www.runescape.com/img/rs3/6-box-right.jpg');
+    background-position: left top, right top;
+    background-repeat: repeat-y, repeat-y;
+    background-size: 6px auto, 6px auto;
+}
+
+/* Top border using ::before */
+.stonework-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: transparent url('https://www.runescape.com/img/rs3/6-box-top.jpg') repeat-x 0 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Bottom border using ::after */
+.stonework-border::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: transparent url('https://www.runescape.com/img/rs3/6-box-bottom.jpg') repeat-x 0 0;
+    z-index: 1;
+    pointer-events: none;
 }
 
 /* ========== LEFT SIDE ========== */
@@ -131,6 +287,12 @@ body {
     border: 1px solid var(--border-gray);
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+
+/* Stonework border overlays the existing border */
+.left-side.stonework-border {
+    border: none; /* Remove default border, stonework handles it */
 }
 
 .left-block-one {
@@ -138,10 +300,32 @@ body {
     min-height: 452px;
     max-height: 452px;
     border-bottom: 1px solid var(--border-gray);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tabbedElement {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent url('https://www.runescape.com/img/rs3/content_repeat_y.jpg') no-repeat 0 0;
+    background-size: cover;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.tabbedElement .inner {
+    position: relative;
+    z-index: 1;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    height: 100%;
+    pointer-events: auto;
 }
 
 .request-header {
@@ -191,13 +375,25 @@ body {
 }
 
 .username-block {
-    flex: 1;
-    min-height: 165px;
-    border-bottom: 1px solid var(--border-gray);
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    --obsidian-clipper-background-opacity: 0.9;
+    --obsidian-clipper-text-muted: #5c5c5c;
+    --obsidian-clipper-background-primary: #1e1e1e;
+    --obsidian-clipper-background-primary-rgb: 12, 12, 12;
+    line-height: 1;
+    font-size: 62.5%;
+    text-align: left;
+    font-family: "MuseoSans", 'Space Mono', monospace;
+    color: #d7dbe1;
+    border: 0;
+    outline: 0;
+    margin: 0;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    display: table-cell;
+    background: transparent url('https://www.runescape.com/img/rs3/content_repeat_y.jpg') repeat 0 0;
+    vertical-align: top;
+    min-height: 165px;
 }
 
 .username-header {
@@ -290,6 +486,22 @@ body {
     gap: 22px;
     justify-content: center;
     align-items: stretch;
+    background: transparent url('https://www.runescape.com/img/rs3/content_repeat_y.jpg') repeat 0 0;
+    position: relative;
+}
+
+.controls-block::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent url('https://www.runescape.com/img/rs3/content_repeat_y.jpg') no-repeat 0 0;
+    background-size: cover;
+    transform: scaleY(-1);
+    pointer-events: none;
+    z-index: 0;
 }
 
 .control-btn {
@@ -303,6 +515,8 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
 }
 
 .control-btn:hover {
@@ -316,6 +530,8 @@ body {
     flex-direction: row !important;
     gap: 26px;
     width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 .personas-btn,
@@ -344,8 +560,8 @@ body {
 .upload-knowledge-btn {
     width: 100%;
     background: var(--bg-black);
-    border: 2px solid var(--online-green);
-    color: var(--online-green);
+    border: 2px solid #C85A28;
+    color: #C85A28;
     font-size: 13px;
     padding: 12px;
     font-family: 'Space Mono', monospace;
@@ -355,10 +571,10 @@ body {
 }
 
 .upload-knowledge-btn:hover {
-    background: var(--online-green);
+    background: #C85A28;
     color: var(--bg-black);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(28, 255, 172, 0.4);
+    box-shadow: 0 4px 12px rgba(200, 90, 40, 0.4);
 }
 
 /* ========== TV SCREEN ========== */
@@ -370,10 +586,87 @@ body {
     overflow: hidden;
 }
 
+/* Stonework border overlays the existing border */
+.tv-screen.stonework-border {
+    border: none; /* Remove default border, stonework handles it */
+}
+
+/* TV Frame Overlay - positioned above canvas */
+.tv-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('./assets/rectangle-vintage-gold-frame-horizontal-border-oriental-style-png.png');
+    background-size: 118% 148%; /* Horizontal and vertical sides slightly closer together */
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none; /* Allow clicks to pass through to canvas */
+    z-index: 6; /* Above canvas and controls, but below noise overlay */
+}
+
+/* TV Screen Texture Overlay (Noise Effect) */
+.tv-screen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 8; /* Above TV frame, below controls */
+    opacity: 0.8;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            rgba(0, 0, 0, 0.4),
+            rgba(0, 0, 0, 0.4) 1px,
+            transparent 1px,
+            transparent 3px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.1),
+            rgba(255, 255, 255, 0.1) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+    /* Slower, smoother animation to prevent flashing - increased duration and linear easing */
+    animation: tvNoise 0.4s infinite linear;
+    /* Apply barrel distortion effect - scale creates the fisheye/barrel look */
+    transform: scale(1.1);
+    transform-origin: center center;
+    /* Barrel distortion shape using border-radius */
+    border-radius: 48% 48% 48% 48% / 45% 45% 45% 45%;
+    /* Smooth rendering to prevent flashing */
+    will-change: background-position;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Prevent any visual glitches */
+    transform-style: preserve-3d;
+}
+
+@keyframes tvNoise {
+    0% { 
+        background-position: 0 0, 0 0;
+    }
+    50% {
+        background-position: 1px 1px, 1px 1px;
+    }
+    100% { 
+        background-position: 0 2px, 2px 0;
+    }
+}
+
 #threeCanvas {
     width: 100%;
     height: 100%;
     display: block;
+    position: relative;
+    z-index: 1; /* Base layer - scene renders here */
+    background: transparent;
 }
 
 .screen-controls {
@@ -383,28 +676,94 @@ body {
     transform: translateX(-50%);
     display: flex;
     gap: 0;
-    z-index: 10;
+    z-index: 15; /* Above everything for interaction */
 }
 
 .screen-btn {
-    width: 124px;
-    height: 30px;
-    background: var(--bg-black);
-    border: 1px solid var(--text-white);
-    color: var(--text-white);
+    width: 140px;
+    height: 40px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--text-primary);
+    color: var(--text-primary);
     font-family: 'Space Mono', monospace;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .screen-btn:hover {
-    background: var(--text-white);
-    color: var(--bg-black);
+    background: var(--accent-primary);
+    color: var(--bg-secondary);
+    border-color: var(--accent-primary);
     transform: scale(1.05);
     z-index: 1;
+}
+
+/* ========== ANGEL CHAT BUBBLE ========== */
+.angel-chat-bubble {
+    position: absolute;
+    z-index: 8;
+    background: var(--bg-primary);
+    border: 2px solid var(--accent-primary);
+    border-radius: 8px;
+    padding: 12px 16px;
+    max-width: 300px;
+    font-family: 'Space Mono', monospace;
+    box-shadow: 0 4px 20px rgba(22, 189, 139, 0.4);
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.angel-chat-bubble.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.angel-chat-bubble::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 10px solid var(--accent-primary);
+}
+
+.angel-chat-bubble::after {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 8px solid var(--bg-primary);
+}
+
+.bubble-name {
+    color: var(--accent-primary);
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.bubble-message {
+    color: var(--text-primary);
+    font-size: 12px;
+    line-height: 1.5;
+    word-wrap: break-word;
 }
 
 /* ========== FOOTER ========== */
@@ -474,6 +833,12 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 30px rgba(28, 255, 172, 0.3);
+    position: relative;
+}
+
+/* Stonework border overlays the existing border */
+.modal-content.stonework-border {
+    border: none; /* Remove default border, stonework handles it */
 }
 
 .modal-header {
@@ -670,8 +1035,31 @@ body {
     transition: border-color 0.3s;
 }
 
+.trait-textarea {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-gray);
+    color: var(--text-white);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    padding: 12px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+}
+
 .trait-input:focus {
     border-color: var(--online-green);
+}
+
+.trait-textarea:focus {
+    border-color: var(--online-green);
+    box-shadow: 0 0 10px rgba(28, 255, 172, 0.3);
+}
+
+.trait-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .trait-input::placeholder {
@@ -736,6 +1124,48 @@ body {
 
 .topic-input::placeholder {
     color: var(--text-gray);
+}
+
+/* ========== MEDIEVAL BUTTON STYLES ========== */
+.medieval-button {
+    padding: 10px 20px;
+    background-color: #795649; /* A dark wood-like brown */
+    color: #f4e5c3; /* A parchment-like off-white */
+    border: 2px solid #c0a080; /* A lighter brown border */
+    font-family: 'Goudy Bookletter 1911', serif; /* A font with an old-style feel */
+    font-size: 18px;
+    text-shadow: 1px 1px 0px #a67c52; /* Gives a bit of depth to the text */
+    box-shadow: 2px 2px 0px #a67c52; /* Simulates an inset look */
+    border-radius: 4px; /* Slightly rounded corners */
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Override for smaller screen control buttons */
+.medieval-button.screen-btn {
+    font-size: 12px;
+    padding: 8px 10px;
+    white-space: nowrap;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Make TOGGLE CHAT button wider to accommodate longer text */
+.medieval-button.screen-btn.third-btn {
+    width: 170px;
+    font-size: 11px;
+}
+
+.medieval-button:hover {
+    background-color: #8a6e2f; /* A lighter, worn wood color for hover */
+    box-shadow: 1px 1px 5px 0px rgba(0, 0, 0, 0.3); /* A more pronounced shadow for hover */
+}
+
+.medieval-button:active {
+    box-shadow: inset 1px 1px 2px 0px rgba(0, 0, 0, 0.5); /* An inset shadow for a pressed effect */
+    transform: translateY(2px); /* Moves the button down to simulate a press */
 }
 
 /* ========== ANIMATIONS ========== */
