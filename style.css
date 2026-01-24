@@ -6,11 +6,27 @@
 
 /* Dark Mode (Default) */
 :root {
-    --bg-primary: #1C1E26;
-    --bg-secondary: #000000;
-    --text-primary: #FFFFFF;
-    --text-secondary: rgba(236, 236, 236, 0.56);
-    --border-color: #9E9E9E;
+    /* Background Colors - Comprehensive Dark Greys */
+    --bg-primary: #1A1D24;           /* Main background - soft dark blue-grey */
+    --bg-secondary: #0F1115;          /* Secondary background - very dark grey */
+    --bg-tertiary: #252830;           /* Tertiary background - medium dark grey */
+    --bg-elevated: #2A2D35;          /* Elevated surfaces - lighter dark grey */
+    --bg-hover: #2F323A;              /* Hover states - slightly lighter */
+    
+    /* Text Colors - Soft Whites and Light Greys */
+    --text-primary: #F5F6F8;          /* Primary text - soft white */
+    --text-secondary: #B8BCC4;        /* Secondary text - light grey */
+    --text-tertiary: #8A8E96;         /* Tertiary text - medium grey */
+    --text-muted: rgba(184, 188, 196, 0.65); /* Muted text - semi-transparent */
+    --text-disabled: #5A5D64;         /* Disabled text - darker grey */
+    
+    /* Border Colors - Subtle Greys */
+    --border-color: #3A3D45;          /* Default border - medium grey */
+    --border-light: #4A4D55;          /* Light border - lighter grey */
+    --border-dark: #2A2D35;           /* Dark border - darker grey */
+    --border-hover: #5A5D64;          /* Hover border - lighter grey */
+    
+    /* Accent Colors - Maintained for consistency */
     --accent-primary: #16BD8B;
     --accent-secondary: #44E990;
     --highlight: #6178FF;
@@ -18,10 +34,10 @@
     --dark-accent: #164B3A;
     
     /* RuneScape Theme Variables */
-    --rs-bg-primary: #1e1e1e;
-    --rs-bg-primary-rgb: 12, 12, 12;
-    --rs-text-primary: #d7dbe1;
-    --rs-text-muted: #5c5c5c;
+    --rs-bg-primary: #1A1D24;
+    --rs-bg-primary-rgb: 26, 29, 36;
+    --rs-text-primary: #E8EAED;
+    --rs-text-muted: #6A6D75;
     --rs-bg-opacity: 0.9;
 }
 
@@ -46,6 +62,13 @@
     --text-gray: var(--text-secondary);
     --border-gray: var(--border-color);
     --online-green: var(--accent-primary);
+    
+    /* Additional utility variables for consistency */
+    --bg-dark: var(--bg-secondary);
+    --bg-medium: var(--bg-tertiary);
+    --bg-light: var(--bg-elevated);
+    --text-bright: var(--text-primary);
+    --text-dim: var(--text-tertiary);
 }
 
 body {
@@ -362,16 +385,16 @@ body {
 }
 
 .request-input::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-tertiary);
 }
 
 .request-input::-webkit-scrollbar-thumb {
-    background: var(--text-gray);
+    background: var(--border-color);
     border-radius: 3px;
 }
 
 .request-input::-webkit-scrollbar-thumb:hover {
-    background: var(--text-white);
+    background: var(--border-light);
 }
 
 .username-block {
@@ -814,7 +837,7 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(15, 17, 21, 0.85);
     backdrop-filter: blur(5px);
 }
 
@@ -860,8 +883,8 @@ body {
 /* Quickset Presets */
 .quickset-presets {
     padding: 15px 30px;
-    background: rgba(0, 0, 0, 0.3);
-    border-bottom: 1px solid var(--border-gray);
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     gap: 10px;
     align-items: center;
@@ -1036,9 +1059,9 @@ body {
 }
 
 .trait-textarea {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--border-gray);
-    color: var(--text-white);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     font-family: 'Space Mono', monospace;
     font-size: 13px;
     padding: 12px;
@@ -1059,7 +1082,7 @@ body {
 }
 
 .trait-textarea::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
 }
 
 .trait-input::placeholder {
