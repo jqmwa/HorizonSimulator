@@ -15,9 +15,9 @@ if (!canvas) {
 
 const scene = new THREE.Scene();
 
-// Dungeon atmosphere - lighter background and less fog for visibility
-scene.background = new THREE.Color(0x2A2A1A); // Lighter dungeon background
-scene.fog = new THREE.Fog(0x3A2F18, 50, 200); // Less dense fog, starts further out
+// Futuristic dark palette – off-black background, micro-blue fog
+scene.background = new THREE.Color(0x0e1116);
+scene.fog = new THREE.Fog(0x1e242e, 50, 200);
 
 // ========== MEDIEVAL DUNGEON LIGHTING ==========
 // Remove bright daylight - replace with torch/fire lighting
@@ -1350,14 +1350,14 @@ function initializeModals() {
         const agentKeys = Object.keys(agents);
         
         if (agentKeys.length === 0) {
-            personasList.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">No agents available</p>';
+            personasList.innerHTML = '<p style="text-align: center; color: #7a8aa3; padding: 20px;">No agents available</p>';
             return;
         }
         
         // Generate colors for each agent
         const colors = [
-            '#16BD8B', '#44E990', '#6178FF', '#4D48E6', 
-            '#FF6B6B', '#FFD93D', '#6BCF7F'
+            '#4da6b8', '#5a78b4', '#6b8aa8', '#7a9ab5', 
+            '#5c7a94', '#8e9eb5', '#4d8a9e'
         ];
         
         // Create UI for each agent
@@ -2117,11 +2117,11 @@ function initializeThemeToggle() {
             localStorage.setItem('theme', newTheme);
             console.log(`🎨 Theme switched to: ${newTheme}`);
             
-            // Update scene background for light mode
+            // Update scene background to match UI palette (off-blacks / micro-blues)
             if (scene) {
-                scene.background = new THREE.Color(newTheme === 'light' ? 0xECECFF : 0x2A3D50);
+                scene.background = new THREE.Color(newTheme === 'light' ? 0xe8ecf2 : 0x0e1116);
                 scene.fog = new THREE.Fog(
-                    newTheme === 'light' ? 0xE1E1FE : 0x556677,
+                    newTheme === 'light' ? 0xdce2ea : 0x1e242e,
                     50,
                     300
                 );
